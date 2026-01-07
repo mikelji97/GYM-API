@@ -16,12 +16,20 @@ class GymClassController extends Controller
         ], 200);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'duration' => 'required|integer|min:1',
+            'max_capacity' => 'required|integer|min:1',
+        ]);
+
+        $gymClass = GymClass::create($validated);
+
+        return response()->json([
+            'data' => $gymClass
+        ], 201);
     }
 
     /**

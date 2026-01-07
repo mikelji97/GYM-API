@@ -44,4 +44,26 @@ class GymClassTest extends TestCase
         $response->assertStatus(200)
                  ->assertJsonCount(3, 'data');
     }
+
+    public function test_can_create_gym_class(): void
+    {
+        $user = User::factory()->create();
+        Passport::actingAs($user);
+
+        $data = [
+            'name' => 'Yoga',
+            'description' => 'Relaxing yoga class',
+            'duration' => 60,
+            'max_capacity' => 20,
+        ];
+
+        $response = $this->postJson('/api/gym-classes', $data);
+
+        $response->assertStatus(201)
+                 ->assertJson([
+                     'data' => $data
+                 ]);
+
+        $this->assertDatabaseHas('gym_classes', $data);
+    }
 }
