@@ -37,7 +37,11 @@ class GymClassController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $gymClass = GymClass::findOrFail($id);
+
+        return response()->json([
+            'data' => $gymClass
+        ], 200);
     }
 
     /**
