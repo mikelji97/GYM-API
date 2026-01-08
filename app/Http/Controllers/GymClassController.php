@@ -48,9 +48,19 @@ class GymClassController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
-    {
-        //
-    }
+{
+    $validated = $request->validate([
+        'name' => 'required|string|max:255',
+        'description' => 'nullable|string',
+        'duration' => 'required|integer|min:1',
+        'max_capacity' => 'required|integer|min:1',
+    ]);
+
+    $gymClass = GymClass::findOrFail($id);
+    $gymClass->update($validated);
+
+    return response()->json(['data' => $gymClass], 200);
+}
 
     /**
      * Remove the specified resource from storage.
