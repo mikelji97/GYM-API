@@ -67,29 +67,31 @@ class GymClassTest extends TestCase
         $this->assertDatabaseHas('gym_classes', $data);
     }
 
-   public function test_can_show_gym_class(): void
-{
-    $user = User::factory()->create();
-    Passport::actingAs($user);
+    public function test_can_show_gym_class(): void
+    {
+        $user = User::factory()->create();
+        Passport::actingAs($user);
 
-    $gymClass = GymClass::factory()->create([
-        'name' => 'Yoga',
-        'description' => 'Relaxing yoga class',
-        'duration' => 60,
-        'max_capacity' => 20,
-    ]);
+        $gymClass = GymClass::factory()->create();
 
-    $response = $this->getJson("/api/gym-classes/{$gymClass->id}");
+        $response = $this->getJson("/api/gym-classes/{$gymClass->id}");
 
-    $response->assertStatus(200)
-             ->assertJson([
-                 'data' => [
-                     'id' => $gymClass->id,
-                     'name' => 'Yoga',
-                     'description' => 'Relaxing yoga class',
-                     'duration' => 60,
-                     'max_capacity' => 20,
-                 ]
-             ]);
-}
+        $response->assertStatus(200)
+                 ->assertJson([
+                     'data' => [
+                         'id' => $gymClass->id,
+                         'name' => $gymClass->name,
+                         'description' => $gymClass->description,
+                         'duration' => $gymClass->duration,
+                         'max_capacity' => $gymClass->max_capacity,
+                     ]
+                 ]);
+    }
+    public function test_can_update_gym_class(): void{
+
+        
+
+
+
+    }
 }
