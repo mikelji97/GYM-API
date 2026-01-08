@@ -87,11 +87,31 @@ class GymClassTest extends TestCase
                      ]
                  ]);
     }
-    public function test_can_update_gym_class(): void{
 
-        
+    public function test_can_update_gym_class(): void
+    {
+        $user = User::factory()->create();
+        Passport::actingAs($user);
 
+        $gymClass = GymClass::factory()->create([
+            'name' => 'Yoga',
+            'description' => 'Basic yoga',
+            'duration' => 60,
+            'max_capacity' => 20,
+        ]);
 
+        $data = [
+            'name' => 'Advanced Yoga',
+            'description' => 'Advanced level',
+            'duration' => 90,
+            'max_capacity' => 15,
+        ];
 
+        $response = $this->putJson("/api/gym-classes/{$gymClass->id}", $data);
+
+        $response->assertStatus(200)
+                 ->assertJson(['data' => $data]);
+
+        $this->assertDatabaseHas('gym_classes', $data);
     }
 }
