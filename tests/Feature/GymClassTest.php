@@ -87,16 +87,41 @@ class GymClassTest extends TestCase
                      ]
                  ]);
     }
+
+    public function test_can_update_gym_class(): void
+    {
+        $user = User::factory()->create();
+        Passport::actingAs($user);
+
+        $gymClass = GymClass::factory()->create();
+
+        $updatedData = [
+            'name' => 'Updated Yoga',
+            'description' => 'Updated description',
+            'duration' => 90,
+            'max_capacity' => 25,
+        ];
+
+        $response = $this->putJson("/api/gym-classes/{$gymClass->id}", $updatedData);
+
+        $response->assertStatus(200)
+                 ->assertJson([
+                     'data' => $updatedData
+                 ]);
+
+        $this->assertDatabaseHas('gym_classes', $updatedData);
+    }
+
     public function test_can_delete_gym_class(): void
-{
-    $user = User::factory()->create();
-    Passport::actingAs($user);
+    {
+        $user = User::factory()->create();
+        Passport::actingAs($user);
 
-    $gymClass = GymClass::factory()->create();
+        $gymClass = GymClass::factory()->create();
 
-    $response = $this->deleteJson("/api/gym-classes/{$gymClass->id}");
+        $response = $this->deleteJson("/api/gym-classes/{$gymClass->id}");
 
-    $response->assertStatus(200);
-    $this->assertDatabaseMissing('gym_classes', ['id' => $gymClass->id]);
-}
+        $response->assertStatus(200);
+        $this->assertDatabaseMissing('gym_classes', ['id' => $gymClass->id]);
+    }
 }
