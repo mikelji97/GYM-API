@@ -37,7 +37,11 @@ class GymClassController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $gymClass = GymClass::findOrFail($id);
+
+        return response()->json([
+            'data' => $gymClass
+        ], 200);
     }
 
     /**
@@ -45,7 +49,17 @@ class GymClassController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'duration' => 'required|integer|min:1',
+            'max_capacity' => 'required|integer|min:1',
+        ]);
+
+        $gymClass = GymClass::findOrFail($id);
+        $gymClass->update($validated);
+
+        return response()->json(['data' => $gymClass], 200);
     }
 
     /**
@@ -53,6 +67,9 @@ class GymClassController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $gymClass = GymClass::findOrFail($id);
+        $gymClass->delete();
+
+        return response()->json(['message' => 'Gym class deleted successfully'], 200);
     }
 }
