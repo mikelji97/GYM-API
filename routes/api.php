@@ -13,4 +13,5 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/gym-classes', [GymClassController::class, 'store']);
     Route::get('/gym-classes/{id}', [GymClassController::class, 'show']);
     Route::put('/gym-classes/{id}', [GymClassController::class, 'update']);
+    Route::delete('/gym-classes/{id}', [GymClassController::class, 'destroy']);
 });
