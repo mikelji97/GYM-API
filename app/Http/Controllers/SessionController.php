@@ -3,20 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Session;
 
 class SessionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
+{
+    $sessions = Session::all();
+    return response()->json(['data' => $sessions], 200);
+}
     public function create()
     {
         //
