@@ -21,6 +21,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/sessions/{id}', [SessionController::class, 'show']);
     Route::post('/sessions', [SessionController::class, 'store']);
     Route::put('/sessions/{id}', [SessionController::class, 'update']);
+    Route::delete('/sessions/{id}', [SessionController::class, 'destroy']);
 });
 
 
