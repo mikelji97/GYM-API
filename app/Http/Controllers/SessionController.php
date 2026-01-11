@@ -58,7 +58,20 @@ class SessionController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $session = Session::findOrFail($id);
+
+        $validated = $request->validate([
+            'gym_class_id' => 'required|exists:gym_classes,id',
+            'date' => 'required|date',
+            'start_time' => 'required',
+            'end_time' => 'required',
+            'room' => 'required|string',
+            'max_capacity' => 'required|integer|min:1',
+        ]);
+
+        $session->update($validated);
+
+        return response()->json(['data' => $session], 200);
     }
 
     /**

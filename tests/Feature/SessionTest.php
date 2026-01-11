@@ -42,7 +42,7 @@ class SessionTest extends TestCase
         $response = $this->getJson('/api/sessions');
 
         $response->assertStatus(200)
-                 ->assertJsonCount(4, 'data');
+            ->assertJsonCount(4, 'data');
     }
 
     public function test_can_show_session(): void
@@ -55,18 +55,18 @@ class SessionTest extends TestCase
         $response = $this->getJson("/api/sessions/{$session->id}");
 
         $response->assertStatus(200)
-                 ->assertJson([
-                     'data' => [
-                         'id' => $session->id,
-                         'gym_class_id' => $session->gym_class_id,
-                         'date' => $session->date,
-                         'start_time' => $session->start_time,
-                         'end_time' => $session->end_time,
-                         'room' => $session->room,
-                         'max_capacity' => $session->max_capacity,
-                         'current_bookings' => $session->current_bookings,
-                     ]
-                 ]);
+            ->assertJson([
+                'data' => [
+                    'id' => $session->id,
+                    'gym_class_id' => $session->gym_class_id,
+                    'date' => $session->date,
+                    'start_time' => $session->start_time,
+                    'end_time' => $session->end_time,
+                    'room' => $session->room,
+                    'max_capacity' => $session->max_capacity,
+                    'current_bookings' => $session->current_bookings,
+                ]
+            ]);
     }
 
     public function test_can_create_session(): void
@@ -88,10 +88,36 @@ class SessionTest extends TestCase
         $response = $this->postJson('/api/sessions', $data);
 
         $response->assertStatus(201)
-                 ->assertJson([
-                     'data' => $data
-                 ]);
+            ->assertJson([
+                'data' => $data
+            ]);
 
         $this->assertDatabaseHas('gym_sessions', $data);
+    }
+    public function test_can_update_session(): void  
+    {
+        $user = User::factory()->create();
+        Passport::actingAs($user);
+
+        $session = Session::factory()->create(); 
+        $newGymClass = \App\Models\GymClass::factory()->create();
+
+        $updatedData = [  
+            'gym_class_id' => $newGymClass->id,
+            'date' => '2026-03-20',
+            'start_time' => '14:00:00',
+            'end_time' => '15:30:00',
+            'room' => 'Sala 2',
+            'max_capacity' => 25,
+        ];
+
+        $response = $this->putJson("/api/sessions/{$session->id}", $updatedData); 
+
+        $response->assertStatus(200)  
+            ->assertJson([
+                'data' => $updatedData
+            ]);
+
+        $this->assertDatabaseHas('gym_sessions', $updatedData);
     }
 }
