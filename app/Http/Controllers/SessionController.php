@@ -22,7 +22,18 @@ class SessionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'gym_class_id' => 'required|exists:gym_classes,id',
+            'date' => 'required|date',
+            'start_time' => 'required',
+            'end_time' => 'required',
+            'room' => 'required|string',
+            'max_capacity' => 'required|integer|min:1',
+        ]);
+
+        $session = Session::create($validated);
+
+        return response()->json(['data' => $session], 201);
     }
 
     /**
