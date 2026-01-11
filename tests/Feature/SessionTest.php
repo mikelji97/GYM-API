@@ -44,4 +44,28 @@ class SessionTest extends TestCase
         $response->assertStatus(200)
                  ->assertJsonCount(4, 'data');
     }
+
+    public function test_can_show_session(): void
+    {
+        $user = User::factory()->create();
+        Passport::actingAs($user);
+
+        $session = Session::factory()->create();
+
+        $response = $this->getJson("/api/sessions/{$session->id}");
+
+        $response->assertStatus(200)
+                 ->assertJson([
+                     'data' => [
+                         'id' => $session->id,
+                         'gym_class_id' => $session->gym_class_id,
+                         'date' => $session->date,
+                         'start_time' => $session->start_time,
+                         'end_time' => $session->end_time,
+                         'room' => $session->room,
+                         'max_capacity' => $session->max_capacity,
+                         'current_bookings' => $session->current_bookings,
+                     ]
+                 ]);
+    }
 }

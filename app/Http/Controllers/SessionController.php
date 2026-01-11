@@ -30,7 +30,8 @@ class SessionController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $session = Session::findOrFail($id);
+        return response()->json(['data' => $session], 200);
     }
 
     /**
