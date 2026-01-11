@@ -120,4 +120,17 @@ class SessionTest extends TestCase
 
         $this->assertDatabaseHas('gym_sessions', $updatedData);
     }
+    public function test_can_delete_session(): void
+    {
+        $user = User::factory()->create();
+        Passport::actingAs($user);
+
+        $session = Session::factory()->create();
+
+        $response = $this->deleteJson("/api/sessions/{$session->id}");
+
+        $response->assertStatus(204);
+
+        $this->assertDatabaseMissing('gym_sessions', ['id' => $session->id]);
+    }
 }
