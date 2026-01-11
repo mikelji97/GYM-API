@@ -68,4 +68,30 @@ class SessionTest extends TestCase
                      ]
                  ]);
     }
+
+    public function test_can_create_session(): void
+    {
+        $user = User::factory()->create();
+        Passport::actingAs($user);
+
+        $gymClass = \App\Models\GymClass::factory()->create();
+
+        $data = [
+            'gym_class_id' => $gymClass->id,
+            'date' => '2026-02-15',
+            'start_time' => '10:00:00',
+            'end_time' => '11:00:00',
+            'room' => 'Sala 1',
+            'max_capacity' => 20,
+        ];
+
+        $response = $this->postJson('/api/sessions', $data);
+
+        $response->assertStatus(201)
+                 ->assertJson([
+                     'data' => $data
+                 ]);
+
+        $this->assertDatabaseHas('gym_sessions', $data);
+    }
 }
