@@ -8,10 +8,10 @@ use App\Models\Session;
 class SessionController extends Controller
 {
     public function index()
-{
-    $sessions = Session::all();
-    return response()->json(['data' => $sessions], 200);
-}
+    {
+        $sessions = Session::all();
+        return response()->json(['data' => $sessions], 200);
+    }
     public function create()
     {
         //
@@ -74,11 +74,11 @@ class SessionController extends Controller
         return response()->json(['data' => $session], 200);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(string $id)
     {
-        //
+        $session = Session::findOrFail($id);
+        $session->delete();
+
+        return response()->json(null, 204);
     }
 }
