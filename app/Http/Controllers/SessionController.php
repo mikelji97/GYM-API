@@ -81,4 +81,9 @@ class SessionController extends Controller
 
         return response()->json(null, 204);
     }
+    public function available()
+    {
+        $sessions = Session::whereColumn('current_bookings', '<', 'max_capacity')->get();
+        return response()->json(['data' => $sessions], 200);
+    }
 }
