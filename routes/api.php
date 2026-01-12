@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\GymClassController;
 use App\Http\Controllers\SessionController;
+use App\Http\Controllers\UserController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -23,6 +24,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/sessions', [SessionController::class, 'store']);
     Route::put('/sessions/{id}', [SessionController::class, 'update']);
     Route::delete('/sessions/{id}', [SessionController::class, 'destroy']);
+    //Users
+    Route::get('/users', [UserController::class, 'index']);
 });
 
 
