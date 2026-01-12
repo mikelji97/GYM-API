@@ -96,4 +96,56 @@ class UserTest extends TestCase
                 ]
             ]);
     }
+
+    public function test_update_own_user(): void
+    {
+        $user = User::factory()->create([
+            'name' => 'Old Name',
+            'email' => 'old@example.com'
+        ]);
+
+        Passport::actingAs($user);
+
+        $response = $this->putJson("/api/users/{$user->id}", [
+            'name' => 'New Name',
+            'email' => 'new@example.com'
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'name',
+                    'email',
+                    'role',
+                    'created_at',
+                    'updated_at'
+                ]
+            ]);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $user->id,
+            'name' => 'New Name',
+            'email' => 'new@example.com'
+        ]);
+    }
+
+    public function test_cannot_update_other_user(): void
+    {
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create(['name' => 'Original Name']);
+
+        Passport::actingAs($user);
+
+        $response = $this->putJson("/api/users/{$otherUser->id}", [
+            'name' => 'Hacked Name'
+        ]);
+
+        $response->assertStatus(403);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $otherUser->id,
+            'name' => 'Original Name'
+        ]);
+    }
 }
