@@ -148,4 +148,36 @@ class UserTest extends TestCase
             'name' => 'Original Name'
         ]);
     }
+
+    public function test_admin_delete_user(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $userToDelete = User::factory()->create();
+
+        Passport::actingAs($admin);
+
+        $response = $this->deleteJson("/api/users/{$userToDelete->id}");
+
+        $response->assertStatus(200);
+
+        $this->assertDatabaseMissing('users', [
+            'id' => $userToDelete->id
+        ]);
+    }
+
+    public function test_user_cannot_delete_user(): void
+    {
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+
+        Passport::actingAs($user);
+
+        $response = $this->deleteJson("/api/users/{$otherUser->id}");
+
+        $response->assertStatus(403);
+
+        $this->assertDatabaseHas('users', [
+            'id' => $otherUser->id
+        ]);
+    }
 }
