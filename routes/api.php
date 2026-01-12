@@ -23,6 +23,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/sessions', [SessionController::class, 'store']);
     Route::put('/sessions/{id}', [SessionController::class, 'update']);
     Route::delete('/sessions/{id}', [SessionController::class, 'destroy']);
+    //Users
+    Route::get('/users', [UserController::class, 'index']);
 });
 
 
