@@ -74,4 +74,26 @@ class UserTest extends TestCase
 
         $response->assertStatus(403);
     }
+
+    public function test_admin_show_any_user(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $targetUser = User::factory()->create();
+
+        Passport::actingAs($admin);
+
+        $response = $this->getJson("/api/users/{$targetUser->id}");
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'name',
+                    'email',
+                    'role',
+                    'created_at',
+                    'updated_at'
+                ]
+            ]);
+    }
 }
