@@ -30,7 +30,7 @@ class UserTest extends TestCase
             'updated_at' => now(),
         ]);
     }
-    
+
     public function test_list_users(): void
     {
         $user = User::factory()->create();
@@ -41,6 +41,59 @@ class UserTest extends TestCase
         $response = $this->getJson('/api/users');
 
         $response->assertStatus(200)
-                 ->assertJsonCount(6, 'data');
+            ->assertJsonCount(6, 'data');
+    }
+
+    public function test_show_user(): void
+    {
+        $user = User::factory()->create();
+        Passport::actingAs($user);
+
+        $response = $this->getJson("/api/users/{$user->id}");
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'name',
+                    'email',
+                    'role',
+                    'created_at',
+                    'updated_at'
+                ]
+            ]);
+    }
+    public function test_cannot_show_other_user(): void
+    {
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+
+        Passport::actingAs($user);
+
+        $response = $this->getJson("/api/users/{$otherUser->id}");
+
+        $response->assertStatus(403);
+    }
+
+    public function test_admin_show_any_user(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $targetUser = User::factory()->create();
+
+        Passport::actingAs($admin);
+
+        $response = $this->getJson("/api/users/{$targetUser->id}");
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'name',
+                    'email',
+                    'role',
+                    'created_at',
+                    'updated_at'
+                ]
+            ]);
     }
 }
