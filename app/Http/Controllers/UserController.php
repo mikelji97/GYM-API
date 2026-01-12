@@ -47,4 +47,18 @@ class UserController extends Controller
 
         return response()->json(['message' => 'Acceso denegado'], 403);
     }
+
+    public function destroy(Request $request, $id)
+    {
+        $loggedUser = $request->user();
+
+        if ($loggedUser->role !== 'admin') {
+            return response()->json(['message' => 'Acceso denegado'], 403);
+        }
+
+        $user = User::findOrFail($id);
+        $user->delete();
+
+        return response()->json(['message' => 'Usuario eliminado'], 200);
+    }
 }
