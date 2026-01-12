@@ -30,4 +30,17 @@ class UserTest extends TestCase
             'updated_at' => now(),
         ]);
     }
+    
+    public function test_list_users(): void
+    {
+        $user = User::factory()->create();
+        Passport::actingAs($user);
+
+        User::factory()->count(5)->create();
+
+        $response = $this->getJson('/api/users');
+
+        $response->assertStatus(200)
+                 ->assertJsonCount(6, 'data');
+    }
 }
