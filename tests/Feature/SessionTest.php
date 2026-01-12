@@ -133,4 +133,21 @@ class SessionTest extends TestCase
 
         $this->assertDatabaseMissing('gym_sessions', ['id' => $session->id]);
     }
+
+    public function test_available_session(): void
+    {
+        $user = User::factory()->create();
+        Passport::actingAs($user);
+
+        Session::factory()->create(['max_capacity' => 10, 'current_bookings' => 5]);
+        Session::factory()->create(['max_capacity' => 10, 'current_bookings' => 10]);
+        Session::factory()->create(['max_capacity' => 20, 'current_bookings' => 15]);
+        Session::factory()->create(['max_capacity' => 50, 'current_bookings' => 5]);
+        Session::factory()->create(['max_capacity' => 20, 'current_bookings' => 25]);
+
+        $response = $this->getJson('/api/sessions/available');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(3, 'data');
+    }
 }
