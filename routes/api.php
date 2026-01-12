@@ -26,6 +26,7 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/sessions/{id}', [SessionController::class, 'destroy']);
     //Users
     Route::get('/users', [UserController::class, 'index']);
+    Route::get('/users/{id}', [UserController::class, 'show']);
 });
 
 
