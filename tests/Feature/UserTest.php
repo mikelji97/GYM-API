@@ -179,7 +179,7 @@ class UserTest extends TestCase
         $this->assertDatabaseHas('users', [
             'id' => $otherUser->id
         ]);
-    }
+    }           
 
     public function test_user_can_see_own_stats(): void
     {
