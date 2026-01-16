@@ -40,10 +40,10 @@ class AuthTest extends TestCase
         ]);
 
         $response->assertStatus(201)
-                 ->assertJsonStructure([
-                     'user' => ['id', 'name', 'email', 'role'],
-                     'token'
-                 ]);
+            ->assertJsonStructure([
+                'user' => ['id', 'name', 'email', 'role'],
+                'token'
+            ]);
 
         $this->assertDatabaseHas('users', [
             'email' => 'test@example.com'
@@ -63,10 +63,10 @@ class AuthTest extends TestCase
         ]);
 
         $response->assertStatus(200)
-                 ->assertJsonStructure([
-                     'user' => ['id', 'name', 'email', 'role'],
-                     'token'
-                 ]);
+            ->assertJsonStructure([
+                'user' => ['id', 'name', 'email', 'role'],
+                'token'
+            ]);
     }
 
     public function test_user_can_logout(): void
@@ -79,8 +79,8 @@ class AuthTest extends TestCase
         ])->postJson('/api/logout');
 
         $response->assertStatus(200)
-                 ->assertJson([
-                     'message' => 'Successfully logged out'
-                 ]);
+            ->assertJson([
+                'message' => 'Successfully logged out'
+            ]);
     }
 }
