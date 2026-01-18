@@ -12,16 +12,13 @@ class SessionController extends Controller
         $sessions = Session::all();
         return response()->json(['data' => $sessions], 200);
     }
-    public function create()
-    {
-        //
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
+        if ($request->user()->role !== 'admin') {
+            return response()->json(['message' => 'Acceso denegado'], 403);
+        }
+
         $validated = $request->validate([
             'gym_class_id' => 'required|exists:gym_classes,id',
             'date' => 'required|date',
@@ -36,28 +33,18 @@ class SessionController extends Controller
         return response()->json(['data' => $session], 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         $session = Session::findOrFail($id);
         return response()->json(['data' => $session], 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
+        if ($request->user()->role !== 'admin') {
+            return response()->json(['message' => 'Acceso denegado'], 403);
+        }
+
         $session = Session::findOrFail($id);
 
         $validated = $request->validate([
@@ -74,13 +61,18 @@ class SessionController extends Controller
         return response()->json(['data' => $session], 200);
     }
 
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
+        if ($request->user()->role !== 'admin') {
+            return response()->json(['message' => 'Acceso denegado'], 403);
+        }
+
         $session = Session::findOrFail($id);
         $session->delete();
 
         return response()->json(null, 204);
     }
+
     public function available()
     {
         $sessions = Session::whereColumn('current_bookings', '<', 'max_capacity')->get();

@@ -18,6 +18,10 @@ class GymClassController extends Controller
 
     public function store(Request $request)
     {
+        if ($request->user()->role !== 'admin') {
+            return response()->json(['message' => 'Acceso denegado'], 403);
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -32,9 +36,6 @@ class GymClassController extends Controller
         ], 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(string $id)
     {
         $gymClass = GymClass::findOrFail($id);
@@ -44,11 +45,12 @@ class GymClassController extends Controller
         ], 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
+        if ($request->user()->role !== 'admin') {
+            return response()->json(['message' => 'Acceso denegado'], 403);
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -62,14 +64,15 @@ class GymClassController extends Controller
         return response()->json(['data' => $gymClass], 200);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(Request $request, string $id)
     {
+        if ($request->user()->role !== 'admin') {
+            return response()->json(['message' => 'Acceso denegado'], 403);
+        }
+
         $gymClass = GymClass::findOrFail($id);
         $gymClass->delete();
 
-        return response()->json(['message' => 'Gym class deleted successfully'], 200);
+        return response()->json(['message' => 'Clase eliminada'], 200);
     }
 }
