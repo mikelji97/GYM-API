@@ -14,12 +14,12 @@ return new class extends Migration
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('class_session_id')->constrained('class_sessions')->onDelete('cascade');
+            $table->foreignId('session_id')->constrained('gym_sessions')->onDelete('cascade');
             $table->enum('status', ['confirmed', 'cancelled', 'attended', 'no_show'])->default('confirmed');
             $table->timestamp('cancelled_at')->nullable();
             $table->timestamps();
 
-            $table->unique(['user_id', 'class_session_id']);
+            $table->unique(['user_id', 'session_id']);
         });
     }
 
