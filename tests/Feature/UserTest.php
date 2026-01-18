@@ -179,7 +179,7 @@ class UserTest extends TestCase
         $this->assertDatabaseHas('users', [
             'id' => $otherUser->id
         ]);
-    }           
+    }
 
     public function test_user_can_see_own_stats(): void
     {
@@ -210,5 +210,51 @@ class UserTest extends TestCase
         $response = $this->getJson("/api/users/{$user2->id}/stats");
 
         $response->assertStatus(403);
+    }
+    public function test_admin_can_see_other_user_stats(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $cliente = User::factory()->create();
+
+        Passport::actingAs($admin);
+
+        $response = $this->getJson("/api/users/{$cliente->id}/stats");
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'data' => [
+                    'total_bookings',
+                    'confirmed',
+                    'cancelled',
+                    'attended',
+                    'no_show'
+                ]
+            ]);
+    }
+
+    public function test_update_with_invalid_email_fails(): void
+    {
+        $user = User::factory()->create();
+        Passport::actingAs($user);
+
+        $response = $this->putJson("/api/users/{$user->id}", [
+            'email' => 'esto-no-es-email'
+        ]);
+
+        $response->assertStatus(422);
+    }
+
+    public function test_update_with_existing_email_fails(): void
+    {
+        $user = User::factory()->create();
+        $otro = User::factory()->create(['email' => 'ocupado@gmail.com']);
+
+        Passport::actingAs($user);
+
+        $response = $this->putJson("/api/users/{$user->id}", [
+            'email' => 'ocupado@gmail.com'
+        ]);
+
+        $response->assertStatus(422);
     }
 }
