@@ -69,10 +69,10 @@ class SessionTest extends TestCase
             ]);
     }
 
-    public function test_can_create_session(): void
+    public function test_admin_can_create_session(): void
     {
-        $user = User::factory()->create();
-        Passport::actingAs($user);
+        $admin = User::factory()->create(['role' => 'admin']);
+        Passport::actingAs($admin);
 
         $gymClass = \App\Models\GymClass::factory()->create();
 
@@ -94,10 +94,32 @@ class SessionTest extends TestCase
 
         $this->assertDatabaseHas('gym_sessions', $data);
     }
-    public function test_can_update_session(): void  
+
+    public function test_user_cannot_create_session(): void
     {
         $user = User::factory()->create();
         Passport::actingAs($user);
+
+        $gymClass = \App\Models\GymClass::factory()->create();
+
+        $data = [
+            'gym_class_id' => $gymClass->id,
+            'date' => '2026-02-15',
+            'start_time' => '10:00:00',
+            'end_time' => '11:00:00',
+            'room' => 'Sala 1',
+            'max_capacity' => 20,
+        ];
+
+        $response = $this->postJson('/api/sessions', $data);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_admin_can_update_session(): void  
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        Passport::actingAs($admin);
 
         $session = Session::factory()->create(); 
         $newGymClass = \App\Models\GymClass::factory()->create();
@@ -120,10 +142,33 @@ class SessionTest extends TestCase
 
         $this->assertDatabaseHas('gym_sessions', $updatedData);
     }
-    public function test_can_delete_session(): void
+
+    public function test_user_cannot_update_session(): void
     {
         $user = User::factory()->create();
         Passport::actingAs($user);
+
+        $session = Session::factory()->create();
+        $newGymClass = \App\Models\GymClass::factory()->create();
+
+        $updatedData = [
+            'gym_class_id' => $newGymClass->id,
+            'date' => '2026-03-20',
+            'start_time' => '14:00:00',
+            'end_time' => '15:30:00',
+            'room' => 'Sala 2',
+            'max_capacity' => 25,
+        ];
+
+        $response = $this->putJson("/api/sessions/{$session->id}", $updatedData);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_admin_can_delete_session(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        Passport::actingAs($admin);
 
         $session = Session::factory()->create();
 
@@ -132,6 +177,20 @@ class SessionTest extends TestCase
         $response->assertStatus(204);
 
         $this->assertDatabaseMissing('gym_sessions', ['id' => $session->id]);
+    }
+
+    public function test_user_cannot_delete_session(): void
+    {
+        $user = User::factory()->create();
+        Passport::actingAs($user);
+
+        $session = Session::factory()->create();
+
+        $response = $this->deleteJson("/api/sessions/{$session->id}");
+
+        $response->assertStatus(403);
+
+        $this->assertDatabaseHas('gym_sessions', ['id' => $session->id]);
     }
 
     public function test_available_session(): void
