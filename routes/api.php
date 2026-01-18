@@ -30,6 +30,9 @@ Route::middleware('auth:api')->group(function () {
     Route::put('/users/{id}', [UserController::class, 'update']);
     Route::delete('/users/{id}', [UserController::class, 'destroy']);
     Route::get('/users/{id}/stats', [UserController::class, 'stats']);
+    //bookings
+    Route::get('/bookings', [BookingController::class, 'index']);  
+
 });
 
 
