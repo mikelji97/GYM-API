@@ -87,5 +87,15 @@ public function test_my_bookings_requires_authentication(): void
 
     $response->assertStatus(401);
 }
+public function test_my_bookings_empty(): void
+{
+    $mikel = User::factory()->create();
+    Passport::actingAs($mikel);
+
+    $response = $this->getJson('/api/bookings/my-bookings');
+
+    $response->assertStatus(200)
+        ->assertJsonCount(0, 'data');
+}
 
 }
