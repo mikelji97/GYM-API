@@ -179,5 +179,36 @@ class UserTest extends TestCase
         $this->assertDatabaseHas('users', [
             'id' => $otherUser->id
         ]);
+    }           
+
+    public function test_user_can_see_own_stats(): void
+    {
+        $user = User::factory()->create();
+        Passport::actingAs($user);
+
+        $response = $this->getJson("/api/users/{$user->id}/stats");
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'data' => [
+                    'total_bookings',
+                    'confirmed',
+                    'cancelled',
+                    'attended',
+                    'no_show'
+                ]
+            ]);
+    }
+
+    public function test_user_cannot_see_other_stats(): void
+    {
+        $user = User::factory()->create();
+        $user2 = User::factory()->create();
+
+        Passport::actingAs($user);
+
+        $response = $this->getJson("/api/users/{$user2->id}/stats");
+
+        $response->assertStatus(403);
     }
 }
