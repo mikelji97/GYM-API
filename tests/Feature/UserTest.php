@@ -193,7 +193,7 @@ class UserTest extends TestCase
                 'data' => [
                     'total_bookings',
                     'confirmed',
-                    'canceled',
+                    'cancelled',
                     'attended',
                     'no_show'
                 ]
