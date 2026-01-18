@@ -32,4 +32,33 @@ class BookingTest extends TestCase
             'updated_at' => now(),
         ]);
     }
+
+    public function test_list_bookings(): void
+    {
+        $maria = User::factory()->create();
+        $pedro = User::factory()->create();
+        Passport::actingAs($maria);
+
+        $yogaSession = Session::factory()->create();
+        Booking::factory()->create(['user_id' => $maria->id, 'session_id' => $yogaSession->id]);
+        Booking::factory()->create(['user_id' => $pedro->id]);
+
+        $response = $this->getJson('/api/bookings');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(1, 'data');
+    }
+
+    public function test_admin_list_all_bookings(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        Passport::actingAs($admin);
+
+        Booking::factory()->count(5)->create();
+
+        $response = $this->getJson('/api/bookings');
+
+        $response->assertStatus(200)
+            ->assertJsonCount(5, 'data');
+    }
 }
