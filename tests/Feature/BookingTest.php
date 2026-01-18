@@ -81,6 +81,11 @@ class BookingTest extends TestCase
     $response->assertStatus(200)
         ->assertJsonCount(2, 'data');
 }
+public function test_my_bookings_requires_authentication(): void
+{
+    $response = $this->getJson('/api/bookings/my-bookings');
 
+    $response->assertStatus(401);
+}
 
 }
