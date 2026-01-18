@@ -83,4 +83,56 @@ class AuthTest extends TestCase
                 'message' => 'Successfully logged out'
             ]);
     }
+    public function test_register_fails_with_short_password(): void
+    {
+        $response = $this->postJson('/api/register', [
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'password' => '123',
+            'password_confirmation' => '123'
+        ]);
+
+        $response->assertStatus(422);
+    }
+
+    public function test_register_fails_with_invalid_email(): void
+    {
+        $response = $this->postJson('/api/register', [
+            'name' => 'Test User',
+            'email' => 'not-an-email',
+            'password' => 'password123',
+            'password_confirmation' => 'password123'
+        ]);
+
+        $response->assertStatus(422);
+    }
+
+    public function test_register_fails_with_duplicate_email(): void
+    {
+        \App\Models\User::factory()->create(['email' => 'test@example.com']);
+
+        $response = $this->postJson('/api/register', [
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'password' => 'password123',
+            'password_confirmation' => 'password123'
+        ]);
+
+        $response->assertStatus(422);
+    }
+
+    public function test_login_fails_with_incorrect_password(): void
+    {
+        \App\Models\User::factory()->create([
+            'email' => 'test@example.com',
+            'password' => \Illuminate\Support\Facades\Hash::make('password123'),
+        ]);
+
+        $response = $this->postJson('/api/login', [
+            'email' => 'test@example.com',
+            'password' => 'wrongpassword'
+        ]);
+
+        $response->assertStatus(401);
+    }
 }
