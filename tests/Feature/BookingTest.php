@@ -158,5 +158,58 @@ public function test_my_bookings_empty(): void
 
         $response->assertStatus(422);
     }
+  public function test_cancel_booking(): void
+    {
+        $mikel = User::factory()->create();
+        Passport::actingAs($mikel);
+
+        $booking = Booking::factory()->create([
+            'user_id' => $mikel->id,
+        ]);
+
+        $response = $this->deleteJson("/api/bookings/{$booking->id}");
+
+        $response->assertStatus(200);
+
+        $this->assertDatabaseHas('bookings', [
+            'id' => $booking->id,
+            'status' => 'cancelled',
+        ]);
+    }
+        public function test_cannot_cancel_other_booking(): void
+    {
+        $mikel = User::factory()->create();
+        $jesus = User::factory()->create();
+        Passport::actingAs($mikel);
+
+        $booking = Booking::factory()->create([
+            'user_id' => $jesus->id,
+        ]);
+
+        $response = $this->deleteJson("/api/bookings/{$booking->id}");
+
+        $response->assertStatus(403);
+    }
+    public function test_admin_cancel_any_booking(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $user = User::factory()->create();
+        Passport::actingAs($admin);
+
+        $booking = Booking::factory()->create([
+            'user_id' => $user->id,
+        ]);
+
+        $response = $this->deleteJson("/api/bookings/{$booking->id}");
+
+        $response->assertStatus(200);
+
+        $this->assertDatabaseHas('bookings', [
+            'id' => $booking->id,
+            'status' => 'cancelled',
+        ]);
+    }
+
+
 
 }

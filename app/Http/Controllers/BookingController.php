@@ -61,4 +61,22 @@ class BookingController extends Controller
 
     return response()->json(['data' => $booking], 201);
 }
+public function destroy(Request $request, $id)
+{
+    $user = $request->user();
+    $booking = Booking::findOrFail($id);
+
+    if ($user->role !== 'admin' && $user->id !== $booking->user_id) {
+        return response()->json(['message' => 'No autorizado'], 403);
+    }
+
+    $booking->update([
+        'status' => 'cancelled',
+        'cancelled_at' => now(),
+    ]);
+
+    $booking->session()->decrement('current_bookings');
+
+    return response()->json(['data' => $booking], 200);
+}
 }
