@@ -97,5 +97,66 @@ public function test_my_bookings_empty(): void
     $response->assertStatus(200)
         ->assertJsonCount(0, 'data');
 }
+   public function test_can_create_booking(): void
+    {
+        $mikel = User::factory()->create();
+        Passport::actingAs($mikel);
+
+        $session = Session::factory()->create([
+            'max_capacity' => 14,
+            'current_bookings' => 6,
+        ]);
+
+        Booking::factory()->create([
+            'user_id' => $mikel->id,
+            'session_id' => $session->id,
+        ]);
+
+        $response = $this->postJson('/api/bookings', [
+            'session_id' => $session->id,
+        ]);
+
+        $response->assertStatus(422);
+    }
+
+    public function test_cannot_duplicate_booking(): void
+    {
+        $laura = User::factory()->create();
+        Passport::actingAs($laura);
+
+        $pilatesSession = Session::factory()->create([
+            'max_capacity' => 20,
+            'current_bookings' => 5,
+        ]);
+
+        $response = $this->postJson('/api/bookings', [
+            'session_id' => $pilatesSession->id,
+        ]);
+
+        $response->assertStatus(201);
+
+        $this->assertDatabaseHas('bookings', [
+            'user_id' => $laura->id,
+            'session_id' => $pilatesSession->id,
+            'status' => 'confirmed',
+        ]);
+    }
+    
+    public function test_cannot_book_full_session(): void
+    {
+        $ana = User::factory()->create();
+        Passport::actingAs($ana);
+
+        $spinningSession = Session::factory()->create([
+            'max_capacity' => 10,
+            'current_bookings' => 10,
+        ]);
+
+        $response = $this->postJson('/api/bookings', [
+            'session_id' => $spinningSession->id,
+        ]);
+
+        $response->assertStatus(422);
+    }
 
 }

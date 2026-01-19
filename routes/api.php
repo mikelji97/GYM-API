@@ -32,9 +32,7 @@ Route::middleware('auth:api')->group(function () {
     Route::delete('/users/{id}', [UserController::class, 'destroy']);
     Route::get('/users/{id}/stats', [UserController::class, 'stats']);
     //bookings
-    Route::get('/bookings', [BookingController::class, 'index']);  
-    Route::get('/api/bookings/my-bookings', [BookingController::class, 'myBookings']); 
-
+    Route::get('/bookings/my-bookings', [BookingController::class, 'myBookings']);
+    Route::get('/bookings', [BookingController::class, 'index']);
+    Route::post('/bookings', [BookingController::class, 'store']);  
 });
-
-
