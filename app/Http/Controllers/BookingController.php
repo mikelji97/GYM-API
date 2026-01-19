@@ -61,4 +61,5 @@ class BookingController extends Controller
 
     return response()->json(['data' => $booking], 201);
 }
+
 }
