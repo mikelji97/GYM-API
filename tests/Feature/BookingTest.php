@@ -118,4 +118,27 @@ public function test_my_bookings_empty(): void
 
         $response->assertStatus(422);
     }
+
+    public function test_cannot_duplicate_booking(): void
+    {
+        $laura = User::factory()->create();
+        Passport::actingAs($laura);
+
+        $pilatesSession = Session::factory()->create([
+            'max_capacity' => 20,
+            'current_bookings' => 5,
+        ]);
+
+        $response = $this->postJson('/api/bookings', [
+            'session_id' => $pilatesSession->id,
+        ]);
+
+        $response->assertStatus(201);
+
+        $this->assertDatabaseHas('bookings', [
+            'user_id' => $laura->id,
+            'session_id' => $pilatesSession->id,
+            'status' => 'confirmed',
+        ]);
+    }
 }
