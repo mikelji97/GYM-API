@@ -176,5 +176,20 @@ public function test_my_bookings_empty(): void
             'status' => 'cancelled',
         ]);
     }
+        public function test_cannot_cancel_other_booking(): void
+    {
+        $mikel = User::factory()->create();
+        $jesus = User::factory()->create();
+        Passport::actingAs($mikel);
+
+        $booking = Booking::factory()->create([
+            'user_id' => $jesus->id,
+        ]);
+
+        $response = $this->deleteJson("/api/bookings/{$booking->id}");
+
+        $response->assertStatus(403);
+    }
+
 
 }
