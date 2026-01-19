@@ -11,14 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('schedules', function (Blueprint $table) {
+        Schema::create('gym_sessions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('gym_class_id')->constrained('gym_classes')->onDelete('cascade');
-            $table->enum('day_of_week', ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']);
+            $table->date('date');
             $table->time('start_time');
-            $table->time('finish_time');
-            $table->string('room')->nullable();
-            $table->boolean('is_active')->default(true);
+            $table->time('end_time');
+            $table->string('room');
+            $table->integer('max_capacity');
+            $table->integer('current_bookings')->default(0);
             $table->timestamps();
         });
     }
@@ -28,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('schedules');
+        Schema::dropIfExists('gym_sessions');
     }
 };

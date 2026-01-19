@@ -42,10 +42,32 @@ class GymClassTest extends TestCase
         $response = $this->getJson('/api/gym-classes');
 
         $response->assertStatus(200)
-                 ->assertJsonCount(3, 'data');
+            ->assertJsonCount(3, 'data');
     }
 
-    public function test_can_create_gym_class(): void
+    public function test_admin_can_create_gym_class(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        Passport::actingAs($admin);
+
+        $data = [
+            'name' => 'Yoga',
+            'description' => 'Relaxing yoga class',
+            'duration' => 60,
+            'max_capacity' => 20,
+        ];
+
+        $response = $this->postJson('/api/gym-classes', $data);
+
+        $response->assertStatus(201)
+            ->assertJson([
+                'data' => $data
+            ]);
+
+        $this->assertDatabaseHas('gym_classes', $data);
+    }
+
+    public function test_user_cannot_create_gym_class(): void
     {
         $user = User::factory()->create();
         Passport::actingAs($user);
@@ -59,12 +81,7 @@ class GymClassTest extends TestCase
 
         $response = $this->postJson('/api/gym-classes', $data);
 
-        $response->assertStatus(201)
-                 ->assertJson([
-                     'data' => $data
-                 ]);
-
-        $this->assertDatabaseHas('gym_classes', $data);
+        $response->assertStatus(403);
     }
 
     public function test_can_show_gym_class(): void
@@ -77,26 +94,83 @@ class GymClassTest extends TestCase
         $response = $this->getJson("/api/gym-classes/{$gymClass->id}");
 
         $response->assertStatus(200)
-                 ->assertJson([
-                     'data' => [
-                         'id' => $gymClass->id,
-                         'name' => $gymClass->name,
-                         'description' => $gymClass->description,
-                         'duration' => $gymClass->duration,
-                         'max_capacity' => $gymClass->max_capacity,
-                     ]
-                 ]);
+            ->assertJson([
+                'data' => [
+                    'id' => $gymClass->id,
+                    'name' => $gymClass->name,
+                    'description' => $gymClass->description,
+                    'duration' => $gymClass->duration,
+                    'max_capacity' => $gymClass->max_capacity,
+                ]
+            ]);
     }
-    public function test_can_delete_gym_class(): void
-{
-    $user = User::factory()->create();
-    Passport::actingAs($user);
 
-    $gymClass = GymClass::factory()->create();
+    public function test_admin_can_update_gym_class(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        Passport::actingAs($admin);
 
-    $response = $this->deleteJson("/api/gym-classes/{$gymClass->id}");
+        $gymClass = GymClass::factory()->create();
 
-    $response->assertStatus(200);
-    $this->assertDatabaseMissing('gym_classes', ['id' => $gymClass->id]);
-}
+        $updatedData = [
+            'name' => 'Updated Yoga',
+            'description' => 'Updated description',
+            'duration' => 90,
+            'max_capacity' => 25,
+        ];
+
+        $response = $this->putJson("/api/gym-classes/{$gymClass->id}", $updatedData);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'data' => $updatedData
+            ]);
+
+        $this->assertDatabaseHas('gym_classes', $updatedData);
+    }
+
+    public function test_user_cannot_update_gym_class(): void
+    {
+        $user = User::factory()->create();
+        Passport::actingAs($user);
+
+        $gymClass = GymClass::factory()->create();
+
+        $updatedData = [
+            'name' => 'Updated Yoga',
+            'description' => 'Updated description',
+            'duration' => 90,
+            'max_capacity' => 25,
+        ];
+
+        $response = $this->putJson("/api/gym-classes/{$gymClass->id}", $updatedData);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_admin_can_delete_gym_class(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        Passport::actingAs($admin);
+
+        $gymClass = GymClass::factory()->create();
+
+        $response = $this->deleteJson("/api/gym-classes/{$gymClass->id}");
+
+        $response->assertStatus(200);
+        $this->assertDatabaseMissing('gym_classes', ['id' => $gymClass->id]);
+    }
+
+    public function test_user_cannot_delete_gym_class(): void
+    {
+        $user = User::factory()->create();
+        Passport::actingAs($user);
+
+        $gymClass = GymClass::factory()->create();
+
+        $response = $this->deleteJson("/api/gym-classes/{$gymClass->id}");
+
+        $response->assertStatus(403);
+        $this->assertDatabaseHas('gym_classes', ['id' => $gymClass->id]);
+    }
 }

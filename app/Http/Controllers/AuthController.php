@@ -28,7 +28,8 @@ class AuthController extends Controller
 
         return response()->json([
             'user' => $user->only(['id', 'name', 'email', 'role']),
-            'token' => $token
+            'token' => $token,
+            'message' => 'User registered successfully'
         ], 201);
     }
 
