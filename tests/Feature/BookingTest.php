@@ -141,4 +141,22 @@ public function test_my_bookings_empty(): void
             'status' => 'confirmed',
         ]);
     }
+    
+    public function test_cannot_book_full_session(): void
+    {
+        $ana = User::factory()->create();
+        Passport::actingAs($ana);
+
+        $spinningSession = Session::factory()->create([
+            'max_capacity' => 10,
+            'current_bookings' => 10,
+        ]);
+
+        $response = $this->postJson('/api/bookings', [
+            'session_id' => $spinningSession->id,
+        ]);
+
+        $response->assertStatus(422);
+    }
+
 }
