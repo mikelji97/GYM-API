@@ -61,4 +61,41 @@ class BookingTest extends TestCase
         $response->assertStatus(200)
             ->assertJsonCount(5, 'data');
     }
+    public function test_user_only__own_bookings(): void
+{
+    $mikel = User::factory()->create();
+    $jesus = User::factory()->create();
+
+    Passport::actingAs($mikel);
+
+    Booking::factory()->count(2)->create([
+        'user_id' => $mikel->id,
+    ]);
+
+    Booking::factory()->create([
+        'user_id' => $jesus->id,
+    ]);
+
+    $response = $this->getJson('/api/bookings/my-bookings');
+
+    $response->assertStatus(200)
+        ->assertJsonCount(2, 'data');
+}
+public function test_my_bookings_requires_authentication(): void
+{
+    $response = $this->getJson('/api/bookings/my-bookings');
+
+    $response->assertStatus(401);
+}
+public function test_my_bookings_empty(): void
+{
+    $mikel = User::factory()->create();
+    Passport::actingAs($mikel);
+
+    $response = $this->getJson('/api/bookings/my-bookings');
+
+    $response->assertStatus(200)
+        ->assertJsonCount(0, 'data');
+}
+
 }
