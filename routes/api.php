@@ -34,6 +34,6 @@ Route::middleware('auth:api')->group(function () {
     //bookings
     Route::get('/bookings/my-bookings', [BookingController::class, 'myBookings']);
     Route::get('/bookings', [BookingController::class, 'index']);
-    Route::post('/bookings', [BookingController::class, 'store']);  
+    Route::post('/bookings', [BookingController::class, 'store']);
     Route::delete('/bookings/{id}', [BookingController::class, 'destroy']);
 });
