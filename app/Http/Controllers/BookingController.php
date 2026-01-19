@@ -45,6 +45,7 @@ class BookingController extends Controller
     // comrpobrar si ya tiene reserva en esta sesion
     $existingBooking = Booking::where('user_id', $user->id)
         ->where('session_id', $session->id)
+        ->where('status', '!=', 'cancelled')
         ->first();
 
     if ($existingBooking) {
