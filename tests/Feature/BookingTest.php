@@ -97,5 +97,25 @@ public function test_my_bookings_empty(): void
     $response->assertStatus(200)
         ->assertJsonCount(0, 'data');
 }
+   public function test_can_create_booking(): void
+    {
+        $mikel = User::factory()->create();
+        Passport::actingAs($mikel);
 
+        $session = Session::factory()->create([
+            'max_capacity' => 14,
+            'current_bookings' => 6,
+        ]);
+
+        Booking::factory()->create([
+            'user_id' => $mikel->id,
+            'session_id' => $session->id,
+        ]);
+
+        $response = $this->postJson('/api/bookings', [
+            'session_id' => $session->id,
+        ]);
+
+        $response->assertStatus(422);
+    }
 }
