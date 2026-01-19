@@ -33,6 +33,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('/users/{id}/stats', [UserController::class, 'stats']);
     //bookings
     Route::get('/bookings', [BookingController::class, 'index']);  
+    Route::get('/api/bookings/my-bookings', [BookingController::class, 'myBookings']); 
 
 });
 
