@@ -190,6 +190,26 @@ public function test_my_bookings_empty(): void
 
         $response->assertStatus(403);
     }
+    public function test_admin_cancel_any_booking(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $user = User::factory()->create();
+        Passport::actingAs($admin);
+
+        $booking = Booking::factory()->create([
+            'user_id' => $user->id,
+        ]);
+
+        $response = $this->deleteJson("/api/bookings/{$booking->id}");
+
+        $response->assertStatus(200);
+
+        $this->assertDatabaseHas('bookings', [
+            'id' => $booking->id,
+            'status' => 'cancelled',
+        ]);
+    }
+
 
 
 }
