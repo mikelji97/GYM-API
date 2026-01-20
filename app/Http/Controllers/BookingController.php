@@ -14,7 +14,8 @@ class BookingController extends Controller
         if ($user->role === 'admin') {
             $bookings = Booking::with(['user', 'session.gymClass'])->get();
         } else {
-            $bookings = Booking::where('user_id', $user->id)->get();
+            $bookings = Booking::with(['session.gymClass'])->where('user_id', $user->id)->get();
+
         }
 
         return response()->json(['data' => $bookings], 200);
