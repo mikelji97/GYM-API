@@ -20,4 +20,8 @@ class Session extends Model
         'max_capacity',
         'current_bookings',
     ];
+    public function gymClass()
+{
+    return $this->belongsTo(GymClass::class, 'gym_class_id');
+}
 }
