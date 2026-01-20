@@ -9,7 +9,7 @@ class SessionController extends Controller
 {
     public function index()
     {
-        $sessions = Session::all();
+        $sessions = Session::with('gymClass')->get();
         return response()->json(['data' => $sessions], 200);
     }
 
