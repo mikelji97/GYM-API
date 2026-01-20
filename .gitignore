@@ -24,3 +24,6 @@ Homestead.yaml
 Thumbs.db
 .claude/
 
+# Passport OAuth migrations (auto-generated)
+/database/migrations/*_create_oauth_*
+

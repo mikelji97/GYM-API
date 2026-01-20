@@ -1,59 +1,179 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# GYM API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+API REST para la gestión de un gimnasio. Los usuarios pueden consultar clases, ver sesiones disponibles y hacer reservas. Los administradores gestionan todo el sistema.
 
-## About Laravel
+## Características
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Gestión de clases** - Yoga, spinning, pilates, etc.
+- **Programación de sesiones** - Fecha, hora y capacidad
+- **Sistema de reservas** - Control automático de plazas disponibles
+- **Estadísticas de usuario** - Reservas confirmadas, canceladas y asistencias
+- **Control de acceso por roles** - Administrador y usuario
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Stack Tecnológico
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+- **Backend:** PHP 8.2, Laravel 11
+- **Base de datos:** MySQL
+- **Autenticación:** Laravel Passport (OAuth2)
+- **Testing:** PHPUnit (50 tests, 126 assertions)
 
-## Learning Laravel
+## Instalación
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+### 1. Clonar el repositorio
+```bash
+git clone https://github.com/mikelji97/GYM-API.git
+cd GYM-API
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 2. Instalar dependencias
+```bash
+composer install
+```
 
-## Laravel Sponsors
+### 3. Configurar entorno
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Editar `.env` con los datos de tu base de datos:
+```env
+DB_DATABASE=gym_db
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-### Premium Partners
+### 4. Configurar base de datos
+```bash
+php artisan migrate
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### 5. Configurar Passport
+```bash
+php artisan passport:keys
+php artisan passport:client --personal
+```
 
-## Contributing
+### 6. Arrancar servidor
+```bash
+php artisan serve
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+API disponible en `http://127.0.0.1:8000/api`
 
-## Code of Conduct
+## Autenticación
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Todas las rutas protegidas requieren el header:
+```
+Authorization: Bearer {tu_token}
+```
 
-## Security Vulnerabilities
+El token se obtiene al hacer login mediante `POST /api/login`.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Roles y Permisos
 
-## License
+| Rol | Permisos |
+|-----|----------|
+| **user** | Ver clases y sesiones<br>Crear y cancelar sus propias reservas<br>Ver sus estadísticas |
+| **admin** | Todos los permisos de usuario<br>Crear, editar y eliminar clases y sesiones<br>Ver todas las reservas<br>Cancelar cualquier reserva |
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Endpoints
+
+### Autenticación
+
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| POST | `/api/register` | Crear cuenta |
+| POST | `/api/login` | Obtener token |
+| POST | `/api/logout` | Cerrar sesión |
+
+### Clases
+
+| Método | Endpoint | Descripción | Rol |
+|--------|----------|-------------|-----|
+| GET | `/api/gym-classes` | Listar todas | Todos |
+| GET | `/api/gym-classes/{id}` | Ver una clase | Todos |
+| POST | `/api/gym-classes` | Crear clase | Admin |
+| PUT | `/api/gym-classes/{id}` | Editar clase | Admin |
+| DELETE | `/api/gym-classes/{id}` | Eliminar clase | Admin |
+
+### Sesiones
+
+| Método | Endpoint | Descripción | Rol |
+|--------|----------|-------------|-----|
+| GET | `/api/sessions` | Listar todas | Todos |
+| GET | `/api/sessions/available` | Solo con plazas | Todos |
+| GET | `/api/sessions/{id}` | Ver una sesión | Todos |
+| POST | `/api/sessions` | Crear sesión | Admin |
+| PUT | `/api/sessions/{id}` | Editar sesión | Admin |
+| DELETE | `/api/sessions/{id}` | Eliminar sesión | Admin |
+
+### Usuarios
+
+| Método | Endpoint | Descripción | Rol |
+|--------|----------|-------------|-----|
+| GET | `/api/users` | Listar usuarios | Admin |
+| GET | `/api/users/{id}` | Ver perfil | Propio o Admin |
+| PUT | `/api/users/{id}` | Editar perfil | Propio o Admin |
+| DELETE | `/api/users/{id}` | Eliminar usuario | Admin |
+| GET | `/api/users/{id}/stats` | Estadísticas | Propio o Admin |
+
+### Reservas
+
+| Método | Endpoint | Descripción | Rol |
+|--------|----------|-------------|-----|
+| GET | `/api/bookings` | Listar reservas | User (propias) / Admin (todas) |
+| GET | `/api/bookings/my-bookings` | Mis reservas | User |
+| POST | `/api/bookings` | Crear reserva | User |
+| DELETE | `/api/bookings/{id}` | Cancelar reserva | User (propia) / Admin (cualquiera) |
+
+## Validaciones
+
+- No se puede reservar una sesión que está llena
+- No se puede reservar dos veces la misma sesión
+- Al cancelar una reserva se libera la plaza automáticamente
+
+## Testing
+```bash
+php artisan test
+```
+
+**Resultado:** 50 tests, 126 assertions
+
+## Estructura del Proyecto
+```
+app/
+├── Http/
+│   └── Controllers/
+│       ├── AuthController.php
+│       ├── BookingController.php
+│       ├── GymClassController.php
+│       ├── SessionController.php
+│       └── UserController.php
+└── Models/
+    ├── Booking.php
+    ├── GymClass.php
+    ├── Session.php
+    └── User.php
+
+database/
+├── factories/
+└── migrations/
+
+tests/
+└── Feature/
+    ├── AuthTest.php
+    ├── BookingTest.php
+    ├── GymClassTest.php
+    ├── SessionTest.php
+    └── UserTest.php
+```
+
+## Licencia
+
+Este proyecto es de código abierto.
+
+## Autor
+
+**Mikel**
+- GitHub: [@mikelji97](https://github.com/mikelji97)
