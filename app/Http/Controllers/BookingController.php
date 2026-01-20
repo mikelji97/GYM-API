@@ -12,9 +12,9 @@ class BookingController extends Controller
         $user = $request->user();
 
         if ($user->role === 'admin') {
-            $bookings = Booking::all();
+            $bookings = Booking::with(['user', 'session.gymClass'])->get();
         } else {
-            $bookings = Booking::where('user_id', $user->id)->get();
+            $bookings = Booking::with(['session.gymClass'])->where('user_id', $user->id)->get();
         }
 
         return response()->json(['data' => $bookings], 200);
@@ -23,7 +23,7 @@ class BookingController extends Controller
     {
         $user = $request->user();
 
-        $bookings = Booking::where('user_id', $user->id)->get();
+        $bookings = Booking::with(['session.gymClass'])->where('user_id', $user->id)->get();
 
         return response()->json(['data' => $bookings], 200);
     }
@@ -37,11 +37,12 @@ class BookingController extends Controller
 
         $session = \App\Models\Session::findOrFail($validated['session_id']);
 
+        // comprobar sesion esta llena
         if ($session->current_bookings >= $session->max_capacity) {
             return response()->json(['message' => 'Sesion llena'], 422);
         }
 
-
+        // comprobar si ya tiene reserva en esta sesion
         $existingBooking = Booking::where('user_id', $user->id)
             ->where('session_id', $session->id)
             ->first();
@@ -57,6 +58,7 @@ class BookingController extends Controller
             }
             return response()->json(['message' => 'Ya tienes reserva en esta sesion'], 422);
         }
+
         $booking = Booking::create([
             'user_id' => $user->id,
             'session_id' => $session->id,
@@ -64,8 +66,6 @@ class BookingController extends Controller
         ]);
 
         $session->increment('current_bookings');
-
-        return response()->json(['data' => $booking], 201);
 
         return response()->json(['data' => $booking], 201);
     }
