@@ -21,7 +21,7 @@ class Session extends Model
         'current_bookings',
     ];
     public function gymClass()
-{
-    return $this->belongsTo(GymClass::class, 'gym_class_id');
-}
+    {
+        return $this->belongsTo(GymClass::class, 'gym_class_id');
+    }
 }

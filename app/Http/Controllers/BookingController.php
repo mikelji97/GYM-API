@@ -12,7 +12,7 @@ class BookingController extends Controller
         $user = $request->user();
 
         if ($user->role === 'admin') {
-            $bookings = Booking::all();
+            $bookings = Booking::with(['user', 'session.gymClass'])->get();
         } else {
             $bookings = Booking::where('user_id', $user->id)->get();
         }
