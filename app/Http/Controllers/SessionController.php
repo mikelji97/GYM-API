@@ -75,7 +75,7 @@ class SessionController extends Controller
 
     public function available()
     {
-        $sessions = Session::whereColumn('current_bookings', '<', 'max_capacity')->get();
+        $sessions = Session::with('gymClass')->whereColumn('current_bookings', '<', 'max_capacity')->get();
         return response()->json(['data' => $sessions], 200);
     }
 }
