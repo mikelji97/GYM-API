@@ -63,22 +63,30 @@ class UserController extends Controller
     }
 
     public function stats(Request $request, $id)
-{
-    $loggedUser = $request->user();
-    $user = User::findOrFail($id);
+    {
+        $loggedUser = $request->user();
+        $user = User::findOrFail($id);
 
-    if ($loggedUser->role === 'admin' || $loggedUser->id == $id) {
+        if ($loggedUser->role !== 'admin' && $loggedUser->id != $id) {
+            return response()->json(['message' => 'Acceso denegado'], 403);
+        }
+
+        if ($loggedUser->role === 'admin' && $loggedUser->id == $id) {
+            return response()->json([
+                'data' => [
+                    'confirmed' => \App\Models\Booking::where('status', 'confirmed')->count(),
+                    'cancelled' => \App\Models\Booking::where('status', 'cancelled')->count(),
+                    'attended' => \App\Models\Booking::where('status', 'attended')->count(),
+                ]
+            ], 200);
+        }
+
         return response()->json([
             'data' => [
-                'total_bookings' => $user->bookings()->count(),
                 'confirmed' => $user->bookings()->where('status', 'confirmed')->count(),
                 'cancelled' => $user->bookings()->where('status', 'cancelled')->count(),
                 'attended' => $user->bookings()->where('status', 'attended')->count(),
-                'no_show' => $user->bookings()->where('status', 'no_show')->count(),
             ]
         ], 200);
     }
-
-    return response()->json(['message' => 'Acceso denegado'], 403);
-}
 }
