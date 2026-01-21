@@ -12,63 +12,56 @@ API REST para la gestión de un gimnasio. Los usuarios pueden consultar clases, 
 
 ## Stack Tecnológico
 
-- **Backend:** PHP 8.2, Laravel 11
+- **Backend:** PHP 8.2, Laravel 12
 - **Base de datos:** MySQL
 - **Autenticación:** Laravel Passport (OAuth2)
-- **Testing:** PHPUnit (50 tests, 126 assertions)
+- **Testing:** PHPUnit
 
 ## Instalación
 
 ### 1. Clonar el repositorio
-```bash
 git clone https://github.com/mikelji97/GYM-API.git
 cd GYM-API
-```
 
 ### 2. Instalar dependencias
-```bash
 composer install
-```
 
 ### 3. Configurar entorno
-```bash
 cp .env.example .env
 php artisan key:generate
-```
 
-Editar `.env` con los datos de tu base de datos:
-```env
+Editar .env y cambiar la conexión de base de datos (por defecto viene SQLite, hay que cambiarlo a MySQL):
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
 DB_DATABASE=gym_db
 DB_USERNAME=root
 DB_PASSWORD=
-```
 
 ### 4. Configurar base de datos
-```bash
+Crear manualmente la base de datos en MySQL:
+CREATE DATABASE gym_db;
+
+Luego ejecutar las migraciones:
 php artisan migrate
-```
 
 ### 5. Configurar Passport
-```bash
-php artisan passport:keys
-php artisan passport:client --personal
-```
+php artisan passport:install
 
-### 6. Arrancar servidor
-```bash
+### 6. Cargar datos de prueba (opcional)
+php artisan db:seed
+
+### 7. Arrancar servidor
 php artisan serve
-```
 
-API disponible en `http://127.0.0.1:8000/api`
+API disponible en http://127.0.0.1:8000/api
 
 ## Autenticación
 
 Todas las rutas protegidas requieren el header:
-```
 Authorization: Bearer {tu_token}
-```
 
-El token se obtiene al hacer login mediante `POST /api/login`.
+El token se obtiene al hacer login mediante POST /api/login.
 
 ## Roles y Permisos
 
@@ -83,49 +76,49 @@ El token se obtiene al hacer login mediante `POST /api/login`.
 
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
-| POST | `/api/register` | Crear cuenta |
-| POST | `/api/login` | Obtener token |
-| POST | `/api/logout` | Cerrar sesión |
+| POST | /api/register | Crear cuenta |
+| POST | /api/login | Obtener token |
+| POST | /api/logout | Cerrar sesión |
 
 ### Clases
 
 | Método | Endpoint | Descripción | Rol |
 |--------|----------|-------------|-----|
-| GET | `/api/gym-classes` | Listar todas | Todos |
-| GET | `/api/gym-classes/{id}` | Ver una clase | Todos |
-| POST | `/api/gym-classes` | Crear clase | Admin |
-| PUT | `/api/gym-classes/{id}` | Editar clase | Admin |
-| DELETE | `/api/gym-classes/{id}` | Eliminar clase | Admin |
+| GET | /api/gym-classes | Listar todas | Todos |
+| GET | /api/gym-classes/{id} | Ver una clase | Todos |
+| POST | /api/gym-classes | Crear clase | Admin |
+| PUT | /api/gym-classes/{id} | Editar clase | Admin |
+| DELETE | /api/gym-classes/{id} | Eliminar clase | Admin |
 
 ### Sesiones
 
 | Método | Endpoint | Descripción | Rol |
 |--------|----------|-------------|-----|
-| GET | `/api/sessions` | Listar todas | Todos |
-| GET | `/api/sessions/available` | Solo con plazas | Todos |
-| GET | `/api/sessions/{id}` | Ver una sesión | Todos |
-| POST | `/api/sessions` | Crear sesión | Admin |
-| PUT | `/api/sessions/{id}` | Editar sesión | Admin |
-| DELETE | `/api/sessions/{id}` | Eliminar sesión | Admin |
+| GET | /api/sessions | Listar todas | Todos |
+| GET | /api/sessions/available | Solo con plazas | Todos |
+| GET | /api/sessions/{id} | Ver una sesión | Todos |
+| POST | /api/sessions | Crear sesión | Admin |
+| PUT | /api/sessions/{id} | Editar sesión | Admin |
+| DELETE | /api/sessions/{id} | Eliminar sesión | Admin |
 
 ### Usuarios
 
 | Método | Endpoint | Descripción | Rol |
 |--------|----------|-------------|-----|
-| GET | `/api/users` | Listar usuarios | Admin |
-| GET | `/api/users/{id}` | Ver perfil | Propio o Admin |
-| PUT | `/api/users/{id}` | Editar perfil | Propio o Admin |
-| DELETE | `/api/users/{id}` | Eliminar usuario | Admin |
-| GET | `/api/users/{id}/stats` | Estadísticas | Propio o Admin |
+| GET | /api/users | Listar usuarios | Admin |
+| GET | /api/users/{id} | Ver perfil | Propio o Admin |
+| PUT | /api/users/{id} | Editar perfil | Propio o Admin |
+| DELETE | /api/users/{id} | Eliminar usuario | Admin |
+| GET | /api/users/{id}/stats | Estadísticas | Propio o Admin |
 
 ### Reservas
 
 | Método | Endpoint | Descripción | Rol |
 |--------|----------|-------------|-----|
-| GET | `/api/bookings` | Listar reservas | User (propias) / Admin (todas) |
-| GET | `/api/bookings/my-bookings` | Mis reservas | User |
-| POST | `/api/bookings` | Crear reserva | User |
-| DELETE | `/api/bookings/{id}` | Cancelar reserva | User (propia) / Admin (cualquiera) |
+| GET | /api/bookings | Listar reservas | User (propias) / Admin (todas) |
+| GET | /api/bookings/my-bookings | Mis reservas | User |
+| POST | /api/bookings | Crear reserva | User |
+| DELETE | /api/bookings/{id} | Cancelar reserva | User (propia) / Admin (cualquiera) |
 
 ## Validaciones
 
@@ -133,15 +126,20 @@ El token se obtiene al hacer login mediante `POST /api/login`.
 - No se puede reservar dos veces la misma sesión
 - Al cancelar una reserva se libera la plaza automáticamente
 
-## Testing
-```bash
-php artisan test
-```
+## Usuarios de prueba (Seeder)
 
-**Resultado:** 50 tests, 126 assertions
+Una vez ejecutado el seeder, puedes usar estas cuentas:
+
+| Email | Password | Rol |
+|-------|----------|-----|
+| admin@gym.com | password | Administrador |
+| juan@gmail.com | password | Usuario |
+| maria@gmail.com | password | Usuario |
+
+## Testing
+php artisan test
 
 ## Estructura del Proyecto
-```
 app/
 ├── Http/
 │   └── Controllers/
@@ -158,7 +156,8 @@ app/
 
 database/
 ├── factories/
-└── migrations/
+├── migrations/
+└── seeders/
 
 tests/
 └── Feature/
@@ -167,10 +166,15 @@ tests/
     ├── GymClassTest.php
     ├── SessionTest.php
     └── UserTest.php
-```
 
 ## Licencia
 
+Este proyecto es de código abierto.
+
+## Autor
+
+**Mikel**
+- GitHub: [@mikelji97](https://github.com/mikelji97)
 Este proyecto es de código abierto.
 
 ## Autor
